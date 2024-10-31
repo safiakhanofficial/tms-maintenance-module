@@ -1,0 +1,322 @@
+﻿@using DAL.Models
+@model DAL.Models.UpdateActivity
+@{
+    ViewData["Title"] = "Vehicle Maintenance Activities";
+}
+
+<style>
+    #activitiesTable {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+        #activitiesTable th, #activitiesTable td {
+            padding: 10px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+            #activitiesTable th:nth-child(1),
+            #activitiesTable td:nth-child(1) {
+                width: 15%;
+            }
+
+            #activitiesTable th:nth-child(2),
+            #activitiesTable td:nth-child(2) {
+                width: 15%;
+            }
+
+            #activitiesTable th:nth-child(3),
+            #activitiesTable td:nth-child(3) {
+                width: 15%;
+            }
+
+            #activitiesTable th:nth-child(4),
+            #activitiesTable td:nth-child(4) {
+                width: 15%;
+            }
+
+            #activitiesTable th:nth-child(5),
+            #activitiesTable td:nth-child(5) {
+                width: 15%;
+            }
+
+            #activitiesTable th:nth-child(6),
+            #activitiesTable td:nth-child(6) {
+                width: 15%;
+            }
+
+            #activitiesTable th:nth-child(7),
+            #activitiesTable td:nth-child(7) {
+                width: 15%;
+            }
+
+            .text-danger {
+                color: red;
+            }
+
+</style>
+
+<div class="text-center">
+    <h2 class="display-4">Maintenance Activities</h2>
+</div>
+
+<div class="d-flex justify-content-between mb-3">
+    <div></div>
+    <button class="btn btn-primary" id="addActivityButton">Add Activity</button>
+</div>
+
+<table id="activitiesTable" class="display">
+    <thead>
+        <tr class="text-start">
+            <th>Maintenance ID</th>
+            <th>Vehicle Name</th>
+            <th>Maintenance Type</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Notes</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var activity in Model.Activities)
+        {
+            <tr class="text-start" data-id="@activity.MaintenanceActivityId">
+                <td class="activityId">@activity.MaintenanceActivityId</td>
+                <td class="editable" data-field="VehicleName">@activity.Vehicle.Name</td>
+                <td class="editable" data-field="MaintenanceType">@activity.MaintenanceType</td>
+                <td class="editable" data-field="Date">@activity.Date?.ToString("yyyy-MM-dd")</td>
+                <td class="editable" data-field="Description">@activity.Description</td>
+                <td class="editable" data-field="Notes">@activity.Notes</td>
+                <td>
+                    <button class="btnUpdate">Update</button>|
+                    <button class="btnDelete">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Update Activity Modal -->
+<div class="modal fade" id="updateActivityModal" tabindex="-1" role="dialog" aria-labelledby="updateActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateActivityModalLabel">Update Activity</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateActivityForm">
+                    <input type="hidden" id="activityId" />
+                    <div class="form-group">
+                        <label for="vehicleName">Vehicle Name</label>
+                        <input type="text" class="form-control" id="vehicleName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="maintenanceType">Maintenance Type</label>
+                        <input type="text" class="form-control" id="maintenanceType" />
+                    </div>
+                    <div class="form-group">
+                        <label for="activityDate">Date</label>
+                        <input type="date" class="form-control" id="activityDate" />
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea class="form-control" id="notes"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveChanges">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Activity Modal -->
+<div class="modal fade" id="addActivityModal" tabindex="-1" role="dialog" aria-labelledby="addActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addActivityModalLabel">Add Activity</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addActivityForm">
+                    <div class="form-group">
+                        <label for="newVehicleName">Vehicle Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="newVehicleName" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="newMaintenanceType">Maintenance Type <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="newMaintenanceType" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="newActivityDate">Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="newActivityDate" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="newDescription">Description</label>
+                        <textarea class="form-control" id="newDescription"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="newNotes">Notes</label>
+                        <textarea class="form-control" id="newNotes"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addActivity">Add Activity</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var table = $('#activitiesTable').DataTable({
+            "order": [[0, "desc"]]
+        });
+
+        $('#addActivityButton').on('click', function () {
+            $('#addActivityModal').modal('show');
+        });
+
+        // Handle Add Activity
+        $('#addActivity').on('click', function () {
+            var vehicleName = $('#newVehicleName').val();
+            var activityDate = $('#newActivityDate').val();
+            var activityType = $('#newMaintenanceType').val();
+            var messages = [];
+
+            if (!vehicleName) {
+                messages.push('Vehicle Name is required.');
+            }
+            if (!activityDate) {
+                messages.push('Date is required.');
+            }
+            if (!activityType) {
+                messages.push('Maintenance Type is required.');
+            }
+
+            if (messages.length > 0) {
+                alert(messages.join('\n'));
+                return;
+            }
+
+            var newArgs = {
+                Activities: [{
+                    MaintenanceType: $('#newMaintenanceType').val(),
+                    Date: $('#newActivityDate').val(),
+                    Description: $('#newDescription').val(),
+                    Notes: $('#newNotes').val(),
+                    Vehicle: {
+                        Name: $('#newVehicleName').val()
+                    }
+                }]
+            };
+
+            $.ajax({
+                url: '/Home/AddActivity',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(newArgs),
+                success: function (res) {
+                    console.log(res);
+                    $('#addActivityModal').modal('hide');
+                    $('#addActivityForm')[0].reset();
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error adding activity: ' + error);
+                }
+            });
+        });
+
+        // Update Activity
+        $('#activitiesTable').on('click', '.btnUpdate', function () {
+            var row = $(this).closest('tr');
+            var activityId = row.data('id');
+
+            // Populate modal fields
+            $('#activityId').val(activityId);
+            $('#vehicleName').val(row.find('[data-field="VehicleName"]').text());
+            $('#maintenanceType').val(row.find('[data-field="MaintenanceType"]').text());
+            $('#activityDate').val(row.find('[data-field="Date"]').text());
+            $('#description').val(row.find('[data-field="Description"]').text());
+            $('#notes').val(row.find('[data-field="Notes"]').text());
+
+            $('#updateActivityModal').modal('show');
+        });
+
+        $('#saveChanges').on('click', function () {
+            var activityId = $('#activityId').val();
+            var args = {
+                Activities: [{
+                    MaintenanceActivityId: activityId,
+                    MaintenanceType: $('#maintenanceType').val(),
+                    Date: $('#activityDate').val(),
+                    Description: $('#description').val(),
+                    Notes: $('#notes').val(),
+                    Vehicle: {
+                        Name: $('#vehicleName').val()
+                    }
+                }]
+            };
+
+            $.ajax({
+                url: '/Home/Update',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(args),
+                success: function (res) {
+                    console.log(res);
+                    $('#updateActivityModal').modal('hide');
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error updating activity: ' + error);
+                }
+            });
+        });
+
+        // Delete Activity
+        $('#activitiesTable').on('click', '.btnDelete', function () {
+            var row = $(this).closest('tr');
+            var activityId = row.data('id');
+
+            $.ajax({
+                url: '/Home/Delete',
+                type: 'Put',
+                contentType: 'application/json',
+                data: JSON.stringify(activityId),
+                success: function (res) {
+                    console.log(res);
+                    alert(res.message);
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    alert('Error deleting activity: ' + error);
+                }
+            });
+        });
+
+        // Close modal
+        $('#addActivityModal .btn-secondary').on('click', function () {
+            $('#addActivityModal').modal('hide');
+        });
+
+
+    });
+</script>
